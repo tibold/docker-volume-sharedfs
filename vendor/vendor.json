@@ -81,5 +81,5 @@
 			"revisionTime": "2017-07-14T13:21:52Z"
 		}
 	],
-	"rootPath": "github.com/tibold/docker-volume-shared"
+	"rootPath": "github.com/tibold/docker-volume-sharedfs"
 }

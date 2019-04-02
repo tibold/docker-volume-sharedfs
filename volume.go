@@ -58,14 +58,14 @@ func (volume *sharedVolume) create() error {
 
 	if err == nil {
 		dataDir := volume.GetDataDir()
-		if _, err = os.Lstat(dataDir); err == nil {
+		if _, err = os.Lstat(dataDir); os.IsNotExist(err) {
 			err = os.Mkdir(dataDir, 750)
 		}
 	}
 
 	if err == nil {
 		locksDir := volume.GetLocksDir()
-		if _, err = os.Lstat(locksDir); err == nil {
+		if _, err = os.Lstat(locksDir); os.IsNotExist(err) {
 			err = os.Mkdir(locksDir, 750)
 		}
 	}
