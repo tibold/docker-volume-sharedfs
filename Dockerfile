@@ -2,8 +2,7 @@ FROM golang:1.10-alpine as builder
 COPY . /go/src/github.com/tibold/docker-volume-sharedfs
 WORKDIR /go/src/github.com/tibold/docker-volume-sharedfs
 RUN set -ex \
-    && apk add --no-cache --virtual .build-deps \
-    gcc libc-dev \
+    && apk add --no-cache --virtual .build-deps git gcc libc-dev \
     && go get -u github.com/kardianos/govendor \
     && govendor sync \
     && go install --ldflags '-extldflags "-static"' \
