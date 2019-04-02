@@ -1,0 +1,8 @@
+#!/bin/bash
+
+mkdir ./volumes
+
+docker plugin set $IMAGE_NAME volumes.source="`pwd`/volumes"
+docker plugin enable $IMAGE_NAME
+
+docker plugin disable $IMAGE_NAME
