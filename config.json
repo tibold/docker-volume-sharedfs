@@ -12,17 +12,24 @@
         "--root=/volumes",
         "--debug"
     ],
-    "mounts": [{
-        "name": "volumes",
-        "destination": "/volumes",
-        "options": [
-          "rbind"
-        ],
-        "source": "",
-        "settable": [
-            "source"
-        ],
-        "type": "bind"
-    }],
-    "propagatedmount": "/volumes"
+    "mounts": [
+        {
+            "name": "volumes",
+            "destination": "/volumes",
+            "options": [
+                "rbind"
+            ],
+            "source": "",
+            "settable": [
+                "source"
+            ],
+            "type": "bind"
+        }
+    ],
+    "propagatedmount": "/volumes",
+    "linux": {
+        "capabilities": [
+            "CAP_SYS_ADMIN"
+        ]
+    }
 }
