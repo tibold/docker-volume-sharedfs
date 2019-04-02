@@ -1,0 +1,7 @@
+*~
+docker-volume-sharedfs
+*.rpm
+*.deb
+obj
+vendor/*/
+plugin/

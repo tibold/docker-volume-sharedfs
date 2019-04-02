@@ -1,0 +1,9 @@
+[Unit]
+Description=Docker Volume Plugin for Shared Filesystems
+Documentation=https://github.com/tibold/docker-volume-sharedfs
+
+[Service]
+ExecStart=/usr/bin/docker-volume-sharedfs
+
+[Install]
+WantedBy=multi-user.target
