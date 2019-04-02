@@ -19,10 +19,14 @@ echo "Create volume 'volume1'"
 docker volume create --driver $IMAGE_NAME volume1
 
 echo "Test folder structure in 'volume1'"
-test -d "./volumes/volume1/_data"
-test -d "./volumes/volume1/_locks"
-test -f "./volumes/volume1/meta.json"
-test -f "./volumes/volume1/_locks/$HOSTNAME.lock"
+echo "Has _data folder"
+test -d "volumes/volume1/_data"
+echo "Has _locks folder"
+test -d "volumes/volume1/_locks"
+echo "Has meta.json"
+test -f "volumes/volume1/meta.json"
+echo "Has lockfile for $HOSTNAME"
+test -f "volumes/volume1/_locks/$HOSTNAME.lock"
 
 echo "Remove volume 'volume1'"
 docker volume rm volume1
