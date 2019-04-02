@@ -10,6 +10,8 @@ mkdir volumes
 echo "Set volumes folder"
 docker plugin set $IMAGE_NAME volumes.source="$(pwd)/volumes"
 
+docker plugin inspect $IMAGE_NAME
+
 echo "Enable plugin"
 docker plugin enable $IMAGE_NAME
 
