@@ -4,6 +4,8 @@ WORKDIR /go/src/github.com/tibold/docker-volume-sharedfs
 RUN set -ex \
     && apk add --no-cache --virtual .build-deps \
     gcc libc-dev \
+    && go get -u github.com/kardianos/govendor \
+    && govendor sync \
     && go install --ldflags '-extldflags "-static"' \
     && apk del .build-deps
 CMD ["/go/bin/docker-volume-sharedfs"]
