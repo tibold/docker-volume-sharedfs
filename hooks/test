@@ -1,8 +1,42 @@
 #!/bin/bash
 
+set -e
+
 mkdir ./volumes
 
+echo "Set volumes folder"
 docker plugin set $IMAGE_NAME volumes.source="`pwd`/volumes"
+
+echo "Enable plugin"
 docker plugin enable $IMAGE_NAME
+
+echo "Create volume 'volume1'"
+docker volume create --driver $IMAGE_NAME volume1
+
+echo "Test folder structure in 'volume1'"
+test -d "./volumes/volume1/_data"
+test -d "./volumes/volume1/_locks"
+test -f "./volumes/volume1/meta.json"
+test -f "./volumes/volume1/_locks/$HOSTNAME.lock"
+
+echo "Remove volume 'volume1'"
+docker volume rm volume1
+
+echo "Test if 'volume1' was deleted from the filesystem"
+test ! -e "./volumes/volume1"
+
+echo "Create protected volume 'volume2'"
+docker volume create --driver $IMAGE_NAME volume2 --opt protected=true
+
+echo "Test if 'volume2' was created"
+test -d "./volumes/volume2"
+
+echo "Remove volume 'volume2'"
+docker volume rm volume2
+
+echo "Test if data was not removed from 'volume2'"
+test -d "./volumes/volume2/_data"
+test -d "./volumes/volume2/_locks"
+test -f "./volumes/volume2/meta.json"
 
 docker plugin disable $IMAGE_NAME
