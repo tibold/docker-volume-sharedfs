@@ -25,8 +25,13 @@ echo "Has _locks folder"
 test -d "volumes/volume1/_locks"
 echo "Has meta.json"
 test -f "volumes/volume1/meta.json"
-echo "Has lockfile for $HOSTNAME"
-ls -Rl "volumes/"
+echo "Test if lockfile exists"
+if [ "$(ls -A volumes/volume1/_locks)" ]; then 
+    echo "Lock file exists"
+else
+    echo "Lock file does not exist"
+    exit 1
+fi
 
 echo "Remove volume 'volume1'"
 docker volume rm volume1
