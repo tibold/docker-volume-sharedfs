@@ -1,0 +1,3 @@
+#!/bin/bash
+
+make -f Makefile.docker PLUGIN_NAME=$DOCKER_REPO PLUGIN_TAG=$DOCKER_TAG
