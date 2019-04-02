@@ -5,10 +5,10 @@ set -e
 echo "Working directory: `pwd`"
 printenv
 
-mkdir /volumes
+mkdir volumes
 
 echo "Set volumes folder"
-docker plugin set $IMAGE_NAME volumes.source="/volumes"
+docker plugin set $IMAGE_NAME volumes.source="$(pwd)/volumes"
 
 echo "Enable plugin"
 docker plugin enable $IMAGE_NAME
