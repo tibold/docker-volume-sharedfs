@@ -11,9 +11,17 @@ Docker Volume plugin to create persistent volumes on a shared filesystem such as
 
 ### Docker Hub
 
-docker plugin install tibold/sharedfs --alias sharedfs
-docker plugin set sharedfs volumes.source=<wherever you want to store the volumes>
-docker plugin enable sharedfs
+Install the plugin from docker hub
+
+    docker plugin install tibold/sharedfs --alias sharedfs
+    
+Configure where to store the volumes
+
+    docker plugin set sharedfs volumes.source=<wherever you want to store the volumes>
+    
+Enable the plugin
+
+    docker plugin enable sharedfs
 
 ### Systemd
 
