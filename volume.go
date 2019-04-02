@@ -145,15 +145,16 @@ func (volume *sharedVolume) getLocks() []string {
 
 // Locks the volume
 func (volume *sharedVolume) lock() error {
-	var err error
 
 	lockFilename := volume.GetLockFile()
 
 	if file, err := os.OpenFile(lockFilename, os.O_RDONLY|os.O_CREATE, 0600); err == nil {
 		file.Close()
+	} else {
+		return err
 	}
 
-	return err
+	return nil
 }
 
 // Unlocks the volume
@@ -161,6 +162,10 @@ func (volume *sharedVolume) unlock() error {
 	var err error
 
 	lockFilename := volume.GetLockFile()
+
+	if _, err = os.Stat(volume.Mountpoint); os.IsNotExist(err) {
+		return nil
+	}
 
 	if _, err = os.Stat(lockFilename); err == nil {
 		err = os.Remove(lockFilename)
