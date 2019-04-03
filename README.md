@@ -136,7 +136,7 @@ Navigate to the volume you want to delete in the filesystem. If the the `_locks`
 
 ## Roadmap
 
-- No outstanding features/requests.
+- Improve the tests executed on docker hub.
 
 ## License
 
