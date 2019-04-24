@@ -51,7 +51,7 @@ func (driver *sharedVolumeDriver) newVolume(name string) *sharedVolume {
 			CreatedAt:  time.Now().Format(time.RFC3339),
 		},
 		Protected: false,
-		Exclusive: true,
+		Exclusive: false,
 	}
 
 	return volume
