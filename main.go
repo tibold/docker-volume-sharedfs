@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"time"
 
 	log "github.com/Sirupsen/logrus"
 
@@ -11,9 +12,12 @@ import (
 )
 
 var (
-	root     = flag.String("root", "", "Base directory where volumes are created in the cluster")
-	debug    = flag.Bool("debug", true, "Enable verbose logging")
-	hostname = flag.String("hostname", "", "The hostname used in locking operations")
+	root            = flag.String("root", "", "Base directory where volumes are created in the cluster")
+	debug           = flag.Bool("debug", true, "Enable verbose logging")
+	hostname        = flag.String("hostname", "", "The hostname used in locking operations")
+	lockInterval    = 20 * time.Second
+	lockTimeout     = 60 * time.Second
+	cleanupInterval = 60 * time.Minute
 )
 
 func main() {

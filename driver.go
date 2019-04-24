@@ -8,9 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"strconv"
 	"sync"
-	"time"
 
 	log "github.com/Sirupsen/logrus"
 
@@ -38,6 +36,8 @@ func newSharedFSDriver(root string) sharedVolumeDriver {
 	// Discover volumes that are already in use by the current node
 	driver.Discover()
 
+	go driver.MaintenanceRoutine()
+
 	return driver
 }
 
@@ -54,59 +54,56 @@ func (driver sharedVolumeDriver) Create(request *dockerVolume.CreateRequest) err
 
 	log.Infof("Create: %s, %v", request.Name, request.Options)
 
+	// Concurrency lock
 	driver.mutex.Lock()
 	defer driver.mutex.Unlock()
 
+	// Is this volume already registered?
 	if _, ok := driver.volumes[request.Name]; ok {
 
 		// Path exists and it is already part of the bookkeeping
-
 		message := fmt.Sprintf("Volume %s already exists.", request.Name)
 		log.Warning(message)
 		return nil
 
 	}
 
-	volumePath := filepath.Join(driver.root, request.Name)
+	// Register a new volume
+	volume := driver.newVolume(request.Name)
+	var err error
 
-	volume := &sharedVolume{
-		Volume: &dockerVolume.Volume{
-			Name:       request.Name,
-			Mountpoint: volumePath,
-			CreatedAt:  time.Now().Format(time.RFC3339),
-		},
-		Protected: false,
-		Exclusive: true,
-	}
+	// Does the volume exist already?
+	if err = volume.loadMetadata(); os.IsNotExist(err) {
+		// The volume does not yet exist
 
-	if err := volume.loadMetadata(); err != nil {
-
-		if optsProtected, ok := request.Options["protected"]; ok {
-			if protected, err := strconv.ParseBool(optsProtected); err == nil {
-				volume.Protected = protected
-			}
-		}
-
-		if optsExclusive, ok := request.Options["exclusive"]; ok {
-			if exclusive, err := strconv.ParseBool(optsExclusive); err == nil {
-				volume.Exclusive = exclusive
-			}
-		}
-
-		if err := volume.create(); err != nil {
+		// Create volume (physical folder structure)
+		if err = volume.createDirectoryStructure(); err != nil {
 			return err
 		}
 
-		if err = volume.saveMetadata(); err != nil {
-			return err
+		// Create a new one if not
+		volume.parseOptions(request.Options)
+
+		// Save the volume metadata
+		if err = volume.saveMetadata(); os.IsExist(err) {
+			// Failed to save metadata, because the file already exists
+
+			// Try to load the metadata again
+			err = volume.loadMetadata()
 		}
 	}
 
+	if err != nil {
+		return err
+	}
+
+	// Try to lock the volume
 	if err := volume.lock(); err != nil {
 		// If the volume cannot be locked, we risk that other nodes may delete it
 		return err
 	}
 
+	// Register in internal bookkeeping
 	driver.volumes[request.Name] = volume
 
 	if *debug {
@@ -117,13 +114,21 @@ func (driver sharedVolumeDriver) Create(request *dockerVolume.CreateRequest) err
 }
 
 func (driver sharedVolumeDriver) Discover() {
+	// Look for existing volumes
 	if files, err := ioutil.ReadDir(*root); err == nil {
 		for _, file := range files {
 
 			filename := file.Name()
 
-			if volume, ok := driver.volumes[filename]; !ok && file.IsDir() {
+			if !file.IsDir() {
+				// Only intersted in directories.
+				continue
+			}
 
+			// Is this volume registered in bookkeeping already?
+			if volume, ok := driver.volumes[filename]; !ok {
+
+				// Try to load the volume information
 				volume = &sharedVolume{
 					Volume: &dockerVolume.Volume{
 						Name:       filename,
@@ -131,16 +136,26 @@ func (driver sharedVolumeDriver) Discover() {
 					},
 				}
 
-				if volume.hasLockfile() {
-					// This volume was locked before.
-					if err := volume.loadMetadata(); err == nil {
+				if err := volume.loadMetadata(); err != nil {
 
-						// No need to lock the volume. It is already locked.
+					// Metadata failed to load, it's likely invalid
+					log.Errorf("Failed to load metadata for volume %s", volume.Name)
+
+				} else {
+
+					// If there is a lockfile add it to bookkeeping
+					if volume.hasLockfile() {
+
 						driver.volumes[volume.Name] = volume
 						log.Infof("Loaded previously attached volume %s", volume.Name)
+					}
 
-					} else {
-						log.Warningf("Failed to load metadata of previously locked volume %s", filename)
+					// Remove any mounts that belonged to us
+					mounts := volume.getMounts()
+					for _, mount := range mounts {
+						if mount.Hostname == *hostname {
+							mount.remove()
+						}
 					}
 				}
 			}
