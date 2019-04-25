@@ -142,6 +142,7 @@ func (volume *sharedVolume) saveMetadata() error {
 			if count < len(content) {
 				err = io.ErrShortWrite
 			}
+			file.Close()
 		}
 	}
 
