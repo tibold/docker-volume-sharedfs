@@ -146,8 +146,14 @@ func (driver sharedVolumeDriver) Discover() {
 					// If there is a lockfile add it to bookkeeping
 					if volume.hasLockfile() {
 
-						driver.volumes[volume.Name] = volume
-						log.Infof("Loaded previously attached volume %s", volume.Name)
+						if err := volume.lock(); err == nil {
+
+							driver.volumes[volume.Name] = volume
+							log.Infof("Loaded previously attached volume %s", volume.Name)
+						} else {
+							volume.unlock()
+							log.Warnf("Failed to lock previously attached volume %s", volume.Name)
+						}
 					}
 
 					// Remove any mounts that belonged to us
