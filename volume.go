@@ -38,7 +38,7 @@ func (volume *sharedVolume) GetLockFileFor(name string) string {
 	return filepath.Join(volume.Mountpoint, "_locks", fmt.Sprintf("%s.lock", name))
 }
 
-func (driver *sharedVolumeDriver) newVolume(name string) *sharedVolume {
+func (driver *sharedVolumeDriver) newVolume(name string, options map[string]string) *sharedVolume {
 
 	// Get the absolute volume path
 	volumePath := filepath.Join(driver.root, name)
@@ -50,14 +50,9 @@ func (driver *sharedVolumeDriver) newVolume(name string) *sharedVolume {
 			Mountpoint: volumePath,
 			CreatedAt:  time.Now().Format(time.RFC3339),
 		},
-		Protected: false,
-		Exclusive: false,
+		Protected: defaultProtected,
+		Exclusive: defaultExclusive,
 	}
-
-	return volume
-}
-
-func (volume *sharedVolume) parseOptions(options map[string]string) {
 
 	// Parse 'protected' option
 	if optsProtected, ok := options["protected"]; ok {
@@ -72,6 +67,8 @@ func (volume *sharedVolume) parseOptions(options map[string]string) {
 			volume.Exclusive = exclusive
 		}
 	}
+
+	return volume
 }
 
 // Creates the directory structure needed for the volume

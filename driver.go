@@ -69,7 +69,7 @@ func (driver sharedVolumeDriver) Create(request *dockerVolume.CreateRequest) err
 	}
 
 	// Register a new volume
-	volume := driver.newVolume(request.Name)
+	volume := driver.newVolume(request.Name, request.Options)
 	var err error
 
 	// Does the volume exist already?
@@ -80,9 +80,6 @@ func (driver sharedVolumeDriver) Create(request *dockerVolume.CreateRequest) err
 		if err = volume.createDirectoryStructure(); err != nil {
 			return err
 		}
-
-		// Create a new one if not
-		volume.parseOptions(request.Options)
 
 		// Save the volume metadata
 		if err = volume.saveMetadata(); os.IsExist(err) {

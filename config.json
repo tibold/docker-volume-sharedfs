@@ -1,34 +1,83 @@
 {
-    "description": "Shared Filesystem Volume plugin for Docker",
-    "documentation": "https://github.com/tibold/docker-volume-sharedfs",
-    "interface": {
-        "types": [
+    "Description": "Shared Filesystem Volume plugin for Docker",
+    "Documentation": "https://github.com/tibold/docker-volume-sharedfs",
+    "Interface": {
+        "Types": [
             "docker.volumedriver/1.0"
         ],
-        "socket": "sharedfs.sock"
+        "Socket": "sharedfs.sock"
     },
-    "entrypoint": [
+    "Entrypoint": [
         "/docker-volume-sharedfs",
-        "--root=/volumes",
-        "--debug"
+        "--root=/volumes"
     ],
-    "mounts": [
+    "Env": [
         {
-            "name": "volumes",
-            "destination": "/volumes",
-            "options": [
-                "rbind"
+            "Description": "Enable debug logging",
+            "Name": "SFS_DEBUG",
+            "Settable": [
+                "value"
             ],
-            "source": "",
-            "settable": [
-                "source"
+            "Value": "0"
+        },
+        {
+            "Description": "Set the lock keepalive interval in seconds",
+            "Name": "SFS_LOCK_INTERVAL",
+            "Settable": [
+                "value"
             ],
-            "type": "bind"
+            "Value": "20"
+        },
+        {
+            "Description": "Set the lock timeout in seconds",
+            "Name": "SFS_LOCK_TIMEOUT",
+            "Settable": [
+                "value"
+            ],
+            "Value": "60"
+        },
+        {
+            "Description": "Set the cleanup interval in minutes",
+            "Name": "SFS_CLEANUP_INTERVAL",
+            "Settable": [
+                "value"
+            ],
+            "Value": "60"
+        },
+        {
+            "Description": "Sets the default value for the 'protected' volume option",
+            "Name": "SFS_DEFAULT_PROTECTED",
+            "Settable": [
+                "value"
+            ],
+            "Value": "0"
+        },
+        {
+            "Description": "Sets the default value for the 'exclusive' volume option",
+            "Name": "SFS_DEFAULT_EXCLUSIVE",
+            "Settable": [
+                "value"
+            ],
+            "Value": "0"
         }
     ],
-    "propagatedmount": "/volumes",
-    "linux": {
-        "capabilities": [
+    "Mounts": [
+        {
+            "Name": "volumes",
+            "Destination": "/volumes",
+            "Options": [
+                "rbind"
+            ],
+            "Source": "",
+            "Settable": [
+                "source"
+            ],
+            "Type": "bind"
+        }
+    ],
+    "PropagatedMount": "/volumes",
+    "Linux": {
+        "Capabilities": [
             "CAP_SYS_ADMIN"
         ]
     }

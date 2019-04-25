@@ -95,7 +95,18 @@ Remove the volume (note that this will _not_ remove the actual data):
 
     docker volume rm postgres-portroach
 
-### Options
+### Plugin Options
+
+Plugin options are set using environment variables. These are settable using the `docker plugin set` command. All variables have the `SFS_` prefix to support running as a systemd service.
+
+* `SFS_DEBUG`: Enable debug logging `SFS_DEBUG.Value=1`
+* `SFS_LOCK_INTERVAL`: Set the lock keepalive interval in *seconds* `SFS_LOCK_INTERVAL.Value=20`
+* `SFS_LOCK_TIMEOUT`: Set the lock timeout in *seconds* `SFS_LOCK_TIMEOUT.Value=60`
+* `SFS_CLEANUP_INTERVAL`: Set the cleanup interval in *minutes* `SFS_CLEANUP_INTERVAL.Value=60`
+* `SFS_DEFAULT_PROTECTED`: Sets the default value for the 'protected' volume option `SFS_DEFAULT_PROTECTED.Value=0`
+* `SFS_DEFAULT_EXCLUSIVE`: Sets the default value for the 'exclusive' volume option `SFS_DEFAULT_EXCLUSIVE.Value=0`
+
+### Volume Options
 
 * `exclusive`: Restrict to one concurrent mount. Default: `true`
 * `protected`: Forbid deleting the data from disk. Default: `false`
